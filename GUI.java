@@ -17,14 +17,15 @@ import java.util.ArrayList;
 public class GUI implements ActionListener {
 
 	JButton clear, solve;
-	JButton[][] matb = new JButton[8][9];
+	JButton[][] matb = new JButton[8][8];
 	JFrame frame = new JFrame("Reversi");
 	JPanel panel = new JPanel(new BorderLayout());
-	private JLabel label = new JLabel();
+	JLabel turnLabel = new JLabel();
+	JLabel scoreLabel = new JLabel();
 	int b = 0;
 
 	/**
-	 * Creates a graphical board 
+	 * Creates a graphical board
 	 */
 	public GUI() {
 		panel.setLayout(new GridLayout(9, 8));
@@ -37,14 +38,11 @@ public class GUI implements ActionListener {
 				matb[i][j] = temp;
 				panel.add(temp);
 			}
-		}	
-		
-		JButton temp = new JButton();
-		temp.setName(101+"");
-		temp.addActionListener(this);
-		matb[0][8] = temp;
-		panel.add(temp);
-		panel.add(label);
+		}
+		scoreLabel.setHorizontalAlignment(JLabel.CENTER);
+		turnLabel.setHorizontalAlignment(JLabel.CENTER);
+		panel.add(scoreLabel);
+		panel.add(turnLabel);
 		frame.add(panel);
 		frame.setSize(800, 800);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -52,21 +50,22 @@ public class GUI implements ActionListener {
 	}
 
 	/**
-	 * Show a dialog value so the user can decide the maximal limit that the algorithm 
-	 * has to run to give the utility values
+	 * Show a dialog value so the user can decide the maximal limit that the
+	 * algorithm has to run to give the utility values
 	 * 
-	 * @return
-	 * 			the limit time that the algorithm has to run to give the utility values
+	 * @return the limit time that the algorithm has to run to give the utility
+	 *         values
 	 */
 	public int getTime() {
-		return Integer.parseInt(JOptionPane.showInputDialog("Enter the maximum time limit in seconds:"));
+		return Integer.parseInt(JOptionPane
+				.showInputDialog("Enter the maximum time limit in seconds:"));
 	}
-	
+
 	/**
 	 * Draw the current state of the board
 	 * 
 	 * @param matrix
-	 * 				represent how the board looks like
+	 *            represent how the board looks like
 	 */
 	public void paint(int[][] matrix) {
 		int count = 0;
@@ -78,7 +77,7 @@ public class GUI implements ActionListener {
 					matb[x][y].setOpaque(true);
 					matb[x][y].setBorderPainted(false);
 					count++;
-				
+
 				} else if (matrix[x + 1][y + 1] == -1) {
 					matb[x][y].setBackground(Color.BLACK);
 					matb[x][y].setOpaque(true);
@@ -88,45 +87,46 @@ public class GUI implements ActionListener {
 
 			}
 		}
-		if(count>0) {
-		matb[0][8].setLabel("White: " + count);
-		} else if(count<0) {
-			matb[0][8].setLabel("Black: " + count);
+		if (count > 0) {
+			scoreLabel.setText("White: +" + count);
+		} else if (count < 0) {
+			scoreLabel.setText("Black: +" + -count);
 
 		} else {
-			matb[0][8].setLabel("Equal");
+			scoreLabel.setText("Equal");
 
 		}
 	}
-	
+
 	/**
 	 * Set a label to display who's turn it is
 	 * 
 	 * @param player
-	 *				represent the player, -1 for black player and 1 for white player
+	 *            represent the player, -1 for black player and 1 for white
+	 *            player
 	 */
 	public void updateLabel(int player) {
-		if(player == -1) {
-			label.setText("White to move");
+		if (player == -1) {
+			turnLabel.setText("White to move");
 		} else {
-			label.setText("Black to move");
+			turnLabel.setText("Black to move");
 		}
 	}
 
 	/**
-	 * Draw all the best possible moves and return which button the are being pressed
+	 * Draw all the best possible moves and return which button the are being
+	 * pressed
 	 * 
 	 * @param rec
-	 * 			a matrix which represent the best possible moves
-	 * @return b
-	 * 			return which button the are being pressed
+	 *            a matrix which represent the best possible moves
+	 * @return b return which button the are being pressed
 	 */
 	public int paintrec(int[][] rec) {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				if (rec[x + 1][y + 1] != 100) {
 
-					matb[x][y].setLabel(rec[x + 1][y + 1]+"");
+					matb[x][y].setLabel(rec[x + 1][y + 1] + "");
 
 				} else {
 					matb[x][y].setLabel("");
@@ -134,7 +134,7 @@ public class GUI implements ActionListener {
 			}
 		}
 		b = -1;
-		while (b == -1 || (b-100)>0) {
+		while (b == -1 || (b - 100) > 0) {
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
@@ -143,15 +143,17 @@ public class GUI implements ActionListener {
 		}
 		return b;
 	}
+
 	/**
 	 * Show message dialog
 	 * 
 	 * @param msg
-	 * 			message that is being shown
+	 *            message that is being shown
 	 */
 	public void msg(String msg) {
-		JOptionPane.showMessageDialog(frame, msg);	
+		JOptionPane.showMessageDialog(frame, msg);
 	}
+
 	/**
 	 * Sets which button that is pressed
 	 */
