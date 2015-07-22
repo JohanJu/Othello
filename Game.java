@@ -1,45 +1,59 @@
-import java.awt.List;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
 
 public class Game {
 	static int[][] matrix = new int[10][10];
 	int player;
-	
+
 	public static void main(String[] args) {
-		 new Game();
-		
+		new Game();
 	}
 
 	/**
-	 * Controll whos turn it is 
+	 * Controll whos turn it is
 	 */
-	
+
 	public Game() {
 		player = 1;
 		matrix[4][4] = 1;
 		matrix[4][5] = -1;
 		matrix[5][4] = -1;
 		matrix[5][5] = 1;
-		
+
 		GUI gui = new GUI();
 		gui.paint(matrix);
-		jjucbr jjucbr = new jjucbr();
-		int time = gui.getTime();
-		gui.updateLabel(player*-1);
+		jjucbr2 jjucbr = new jjucbr2();
+		boolean ai = gui.ai();
+		boolean help = gui.help();
+		int level;
+		if (ai) {
+			level = gui.getLevel();
+			if (level > 10) {
+				level = 10;
+			}
+		} else {
+			level = 1;
+		}
+
+		gui.updateLabel(player * -1);
 		boolean finish = false;
 		int noMove = 1;
 		boolean valid = false;
-		
+
 		while (!finish) {
 			int[][] countMatrix = new int[10][10];
-			countMatrix = jjucbr.getAlphaBetaMatrix(matrix, player,3, time);
-			
+			if (help || ai) {
+				if (player == 1) {
+					countMatrix = jjucbr.getAlphaBetaMatrix(matrix, player, 1);
+				} else {
+					countMatrix = jjucbr.getAlphaBetaMatrix(matrix, player, level);
+				}
+			}
+
 			// change turn if cant move
 			if (noMove == 0) {
-					noMove = 1;
-				}
+				noMove = 1;
+			}
 			for (int i = 1; i < 9; i++) {
 				for (int j = 1; j < 9; j++) {
 					if (countMatrix[i][j] != 100) {
@@ -48,23 +62,57 @@ public class Game {
 				}
 			}
 			if (noMove == 1) {
-				gui.msg("Player "+player+" no moves");
+				String[] pl = { "Black", "White" };
+				gui.msg("Player " + pl[(player + 1) / 2] + " no moves");
 				gui.updateLabel(player);
 				noMove = 2;
 				player = player * -1;
 				continue;
 			} else if (noMove == 2) {
-				gui.msg("Game over");
+				int count = 0;
+				for (int x = 0; x < 8; x++) {
+					for (int y = 0; y < 8; y++) {
+
+						if (matrix[x + 1][y + 1] == 1) {
+							count++;
+						} else if (matrix[x + 1][y + 1] == -1) {
+							count--;
+						}
+
+					}
+				}
+				if (count == 0) {
+					gui.msg("Game over, draw");
+				}else if(count<0){
+					gui.msg("Game over, Black won with "+-count);
+				}else{
+					gui.msg("Game over, White won with "+count);
+				}
 				finish = true;
 				continue;
 			}
-			// Wait until player pushes a button which is a valid 
-			while(!valid)		
-			{
-				int b = gui.paintrec(countMatrix);
+			// Wait until player pushes a button which is a valid
+			if (player == 1 || !ai) {
+				while (!valid) {
+					int b = gui.paintrec(countMatrix, help);
+					gui.updateLabel(player);
+					int x = b / 10, y = b % 10;
+					valid = turn(x, y, player);
+				}
+			} else {
+				int x = 0, y = 0, min = 1000;
+				for (int i = 1; i < 9; i++) {
+					for (int j = 1; j < 9; j++) {
+						int t = countMatrix[i][j];
+						if (t < min && t != 100) {
+							min = countMatrix[i][j];
+							x = j - 1;
+							y = i - 1;
+						}
+					}
+				}
 				gui.updateLabel(player);
-				int x = b / 10 , y = b % 10;
-				valid = turn(x, y, player);
+				valid = turn(y, x, player);
 			}
 			valid = false;
 			gui.paint(matrix);
@@ -75,11 +123,12 @@ public class Game {
 	 * Change the board when player put a piece at position (x,y)
 	 * 
 	 * @param x
-	 * 			x position of the piece that is going to be placed 
+	 *            x position of the piece that is going to be placed
 	 * @param y
-	 * 			y position of the piece that is going to be placed
+	 *            y position of the piece that is going to be placed
 	 * @param player
-	 * 			represent the player, -1 for black player and 1 for white player
+	 *            represent the player, -1 for black player and 1 for white
+	 *            player
 	 */
 	public boolean turn(int x, int y, int player) {
 		boolean valid = false;
@@ -100,7 +149,7 @@ public class Game {
 					ty--;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
@@ -119,7 +168,7 @@ public class Game {
 					ty--;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
@@ -139,7 +188,7 @@ public class Game {
 					tx++;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
@@ -159,7 +208,7 @@ public class Game {
 					tx++;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
@@ -180,7 +229,7 @@ public class Game {
 					tx++;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
@@ -199,7 +248,7 @@ public class Game {
 					ty++;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
@@ -219,7 +268,7 @@ public class Game {
 					tx--;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
@@ -238,7 +287,7 @@ public class Game {
 					tx--;
 				}
 				if (matrix[tx][ty] == player) {
-					for(int i = 0; i < change.size(); i++) {
+					for (int i = 0; i < change.size(); i++) {
 						a = change.get(i);
 						i++;
 						b = change.get(i);
