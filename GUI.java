@@ -1,18 +1,13 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class GUI implements ActionListener {
 
@@ -56,9 +51,19 @@ public class GUI implements ActionListener {
 	 * @return the limit time that the algorithm has to run to give the utility
 	 *         values
 	 */
-	public int getTime() {
-		return Integer.parseInt(JOptionPane
-				.showInputDialog("Enter the maximum time limit in seconds:"));
+	public int getLevel() {
+		return Integer.parseInt(JOptionPane.showInputDialog("Enter the level:"));
+	}
+
+	public boolean help() {
+		int n = JOptionPane.showConfirmDialog(frame, "Show valid moves?", "", JOptionPane.YES_NO_OPTION);
+		return n == 0;
+
+	}
+
+	public boolean ai() {
+		int n = JOptionPane.showConfirmDialog(frame, "Play against AI", "", JOptionPane.YES_NO_OPTION);
+		return n == 0;
 	}
 
 	/**
@@ -67,6 +72,7 @@ public class GUI implements ActionListener {
 	 * @param matrix
 	 *            represent how the board looks like
 	 */
+	@SuppressWarnings("deprecation")
 	public void paint(int[][] matrix) {
 		int count = 0;
 		for (int x = 0; x < 8; x++) {
@@ -107,9 +113,9 @@ public class GUI implements ActionListener {
 	 */
 	public void updateLabel(int player) {
 		if (player == -1) {
-			turnLabel.setText("White to move");
+			turnLabel.setText("White");
 		} else {
-			turnLabel.setText("Black to move");
+			turnLabel.setText("Black");
 		}
 	}
 
@@ -121,15 +127,18 @@ public class GUI implements ActionListener {
 	 *            a matrix which represent the best possible moves
 	 * @return b return which button the are being pressed
 	 */
-	public int paintrec(int[][] rec) {
-		for (int x = 0; x < 8; x++) {
-			for (int y = 0; y < 8; y++) {
-				if (rec[x + 1][y + 1] != 100) {
+	@SuppressWarnings("deprecation")
+	public int paintrec(int[][] rec, boolean help) {
+		if (help) {
+			for (int x = 0; x < 8; x++) {
+				for (int y = 0; y < 8; y++) {
+					if (rec[x + 1][y + 1] != 100) {
 
-					matb[x][y].setLabel(rec[x + 1][y + 1] + "");
+						matb[x][y].setLabel("X");
 
-				} else {
-					matb[x][y].setLabel("");
+					} else {
+						matb[x][y].setLabel("");
+					}
 				}
 			}
 		}
