@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 
-
 public class Game {
 	static int[][] matrix = new int[10][10];
 	int player;
@@ -21,7 +20,7 @@ public class Game {
 		matrix[5][5] = 1;
 
 		GUI gui = new GUI();
-		gui.paint(matrix);
+		gui.paint(matrix, -1, -1);
 		jjucbr2 jjucbr = new jjucbr2();
 		boolean ai = gui.ai();
 		boolean help = gui.help();
@@ -83,39 +82,50 @@ public class Game {
 				}
 				if (count == 0) {
 					gui.msg("Game over, draw");
-				}else if(count<0){
-					gui.msg("Game over, Black won with "+-count);
-				}else{
-					gui.msg("Game over, White won with "+count);
+				} else if (count < 0) {
+					gui.msg("Game over, Black won with " + -count);
+				} else {
+					gui.msg("Game over, White won with " + count);
 				}
 				finish = true;
 				continue;
 			}
 			// Wait until player pushes a button which is a valid
+			int x = 0, y = 0;
 			if (player == 1 || !ai) {
 				while (!valid) {
 					int b = gui.paintrec(countMatrix, help);
 					gui.updateLabel(player);
-					int x = b / 10, y = b % 10;
+					x = b / 10;
+					y = b % 10;
 					valid = turn(x, y, player);
 				}
+				x = -1;
+				y = -1;
 			} else {
-				int x = 0, y = 0, min = 1000;
+				int min = 1000;
 				for (int i = 1; i < 9; i++) {
 					for (int j = 1; j < 9; j++) {
 						int t = countMatrix[i][j];
 						if (t < min && t != 100) {
 							min = countMatrix[i][j];
-							x = j - 1;
-							y = i - 1;
+							x = i - 1;
+							y = j - 1;
 						}
 					}
 				}
 				gui.updateLabel(player);
-				valid = turn(y, x, player);
+				valid = turn(x, y, player);
 			}
 			valid = false;
-			gui.paint(matrix);
+			gui.paint(matrix, x, y);
+			if (ai&&player==-1) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

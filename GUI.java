@@ -73,7 +73,7 @@ public class GUI implements ActionListener {
 	 *            represent how the board looks like
 	 */
 	@SuppressWarnings("deprecation")
-	public void paint(int[][] matrix) {
+	public void paint(int[][] matrix, int a, int b) {
 		int count = 0;
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
@@ -90,7 +90,9 @@ public class GUI implements ActionListener {
 					matb[x][y].setBorderPainted(false);
 					count--;
 				}
-
+				if (a != -1 && b != -1) {
+					matb[a][b].setBackground(Color.RED);
+				}
 			}
 		}
 		if (count > 0) {
@@ -145,7 +147,7 @@ public class GUI implements ActionListener {
 		b = -1;
 		while (b == -1 || (b - 100) > 0) {
 			try {
-				Thread.sleep(10);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
